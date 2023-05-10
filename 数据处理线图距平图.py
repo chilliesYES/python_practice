@@ -26,11 +26,11 @@ font = {'weight': 'bold',
 plt.rc('font', **font)
 
 
-#data2 = pd.read_csv('year_daily.txt', sep='\s', header=0, dtype={'time': str, 'ozone': float})
+#data2 = pd.read_csv('year_daily.txt', sep='\s+', header=0, dtype={'time': str, 'ozone': float})正常来说是这样写的。注意sep='=\s+'是表示以n个空格作为分隔符如果是s表示以一个空格做分隔符
 #time = data2['time']
-#NO2= data2['ozone']这样不能正确导入数据
-data2 = pd.read_csv('year_daily.txt', delim_whitespace=True, index_col=0)
-time = data2.index
+#NO2= data2['ozone']
+data2 = pd.read_csv('year_daily.txt', delim_whitespace=True, index_col=0)#gpt给的我也不知道为什么，上下三行是一样的结果
+time = data2.index#做索引
 NO2 = data2['ozone']
 fig = plt.figure(num=1, figsize=(6,4))
 p = fig.add_subplot(111)

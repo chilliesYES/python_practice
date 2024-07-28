@@ -9,7 +9,7 @@ for e in users:
     rusers.update({e:mdt1})
 
 newuser = input("please enter your username: ")
-usersnames = rusers.keys()
+usersnames = rusers.keys()#注意这里返回的是视图对象
 while True:
     if newuser in usersnames:
         newuser = input("your name has been used, please enter your username again: ")

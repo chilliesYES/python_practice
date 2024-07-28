@@ -1,0 +1,25 @@
+import hashlib
+#result = hashlib.md5(b"FishC")
+#print(result.hexdigest())
+rusers={}
+users = {"小甲鱼":"I_love_FishC","不二如是":"FishC5201314"}
+for e in users:
+    mdt0 = hashlib.md5(users[e].encode())#encode把users[e]转换为字节串因为md5需要字节串输入
+    mdt1 = mdt0.hexdigest()
+    rusers.update({e:mdt1})
+
+newuser = input("please enter your username: ")
+usersnames = rusers.keys()
+while True:
+    if newuser in usersnames:
+        newuser = input("your name has been used, please enter your username again: ")
+    else:
+        newpw = input("please enter your password: ")
+        newmd5 = hashlib.md5(newpw.encode())  # ???
+        newpw = newmd5.hexdigest()
+        break
+rusers.update({newuser:newpw})
+
+print("以下是已注册用户和密码:\n")#\n作为转义字符应该在引号里面
+for user, pwd in rusers.items():
+    print(f"{user}：{pwd}")#格式化字符串

@@ -1,3 +1,11 @@
+times = [1, 3, 3.5, 6.5, 9.5, 10, 10.8]
+times=[0]+times
+names = ["A", "B", "C", "D", "E", "F", "G"]
+e=[]
+for p in names:
+    e.append(times[names.index(p)+1]-times[names.index(p)])#这里在循环中多次索引位置会影响性能，可以利用range避免反复索引
+r=list(zip(e,names))
+
 maxer=[]
 miner=[]
 max0=max(e)

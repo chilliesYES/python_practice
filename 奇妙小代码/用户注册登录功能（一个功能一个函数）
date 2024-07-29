@@ -1,0 +1,58 @@
+print('''
+============================
+欢迎来到米奇不妙屋
+1.登录
+2.注册
+3.退出''')
+ac = input('请选择你的操作\n')
+print('============================')
+usersif = {}
+def log_in(name,pw):
+        while True:
+            if usersif.get(name) == pw:
+                print('恭喜！登录成功')
+                print('============================')
+                break
+            elif name in usersif:
+                agpw = input('您的密码输入错误，请再次输入密码')
+                pw = agpw
+            else:
+                care=input('您的账号尚未注册，是否进行注册')
+                if care=="是":
+                    sign_up(name,pw)
+                else:
+                    print('滚滚滚')
+                    break
+        print()
+        print('============================')
+def sign_up(name,pw):
+    if name not in usersif:
+        usersif[name] = pw
+        tr = input('恭喜您注册成功，需要登录请回复1')
+        if tr=="1":
+            name=input('请输入您的用户名：')
+            pw  =input('请输入您的密码：')
+            log_in(name,pw)
+        else:
+            print('谢谢访问')
+            print('============================')
+    else:
+        print('您已注册，请登录')
+        name = input('请输入您的用户名：')
+        pw = input('请输入您的密码：')
+        log_in(name,pw)
+
+
+if ac=="1":
+    name = input('请输入您的用户名：')
+    pw = input('请输入您的密码：')
+    log_in(name,pw)
+elif ac=="2":
+    name = input('请输入您的用户名：')
+    pw = input('请输入您的密码：')
+    sign_up(name, pw)
+elif ac=="3":
+    print("滚滚滚")
+    print('============================')
+else:
+    print('你是傻逼吗，叫你输123你给我输别的，靠北了我真的是')

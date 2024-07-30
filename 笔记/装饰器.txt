@@ -1,0 +1,33 @@
+import time
+def time_m(func):
+    print('i am starting now')
+    start = time.time()
+    func()
+    end = time.time()
+    print('everything is end')
+    print(f'the program took {(end-start):.3f}second')
+def omgd():
+    time.sleep(2)
+    print('i am working now')
+time_m(omgd)
+
+
+
+
+def time_ma(wc):
+    def call():
+        print('i am starting now')
+        start = time.time()
+        wc()
+        end = time.time()
+        print('everything is end')
+        print(f'the program took {(end - start):.3f}second')
+    return call
+@time_ma    #装饰器：意思是调用timesleep时把timesleep作为一个参数塞到time_ma中进行运行效果和下面注释的那行代码一样
+def timesleep():
+    time.sleep(2)
+    print('i am working now')
+#timesleep = time_ma(timesleep)
+timesleep()
+
+

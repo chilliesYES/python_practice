@@ -1,0 +1,24 @@
+import random
+
+
+tank=[]
+def fy_shuffle(txt,times):
+    global tank
+    for i in range(times):
+        if len(txt)>0:
+            for t in range(len(txt)):
+                ltxt=(random.randint(0,len(txt)-1))#randomint（a，b）包括ab
+                dtxt=txt[ltxt]
+                tank.append(dtxt)
+                txt.pop(ltxt)
+        print('第{}次打乱结果是:'.format(i+1),tank)
+        txt=tank
+
+ask0=input('你的内容:')
+ask1=input('打乱几次呢：')
+
+ask0=list(ask0)
+ask1=int(ask1)
+fy_shuffle(ask0,ask1)
+
+

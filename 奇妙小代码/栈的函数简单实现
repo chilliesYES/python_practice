@@ -1,0 +1,25 @@
+st=[]
+def push(sth):
+    st.extend(sth)
+    for i in range(len(st)):
+        print(st[-i-1])
+        #print(sth)
+def pop():
+    if len(st)!=0:
+        print(st[len(st)])
+        st.pop(len(st))
+    else:
+        print('aaaa')
+
+while True:
+    choose=input('请输入你的功能')
+    if choose=='push':
+        in0 = input('请输入你想加入的东西')
+        in0 = in0.split(',')
+        print(type(in0))
+        push(in0)
+    elif choose=='pop':
+        pop()
+    elif choose=='exit':
+        break
+print('ok')

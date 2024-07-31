@@ -1,0 +1,31 @@
+num = map(lambda x :x**2,range(10))
+num = list(num)
+print(num)
+
+gl = filter(lambda x:x%2, range(10))
+gl=list(gl)
+print(gl)
+
+square =lambda x:x**2
+t=square(3)
+print(t)
+
+square = lambda x:x*x
+cube = lambda x:x**3
+add  =lambda x:x+1
+t = 2
+f = add(cube(square(t)))
+print(f)
+
+members = {
+    "鱼C工作室": {"小甲鱼": 83, "不二如是": 89, "二师兄": 64, "小师妹": 75, "鱼小二": 96},
+    "复仇者联盟": {"钢铁侠": 85, "绿巨人": 39, "黑寡妇": 82, "鹰眼": 73, "雷神": 99},
+    "奥特曼家族": {"迪迦": 99, "艾斯": 84, "泰罗": 63, "佐菲": 78, "赛文": 78}}
+#x=list(filter(lambda y:y[1]==min(members[0].values()), members[0].items())
+x = [dict(filter(lambda y:y[1]==min(members[team].values()),members[team].items())) for team in members]#members[team].items()返回的是元组
+#GPT写的：x = [min(members[team].items(), key=lambda item: item[1]) for team in members]
+print(x)
+
+power = {"吕布":999, "关羽":888, "刘备":666, "张飞":900, "赵云":789, "不二如是":999}
+greater = list(filter(lambda p:p[1]>800,power.items()))
+print(greater)

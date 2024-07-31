@@ -1,0 +1,19 @@
+import sys
+def frange(start, stop, step):
+    if start == None:
+        start = 0.0
+    if stop == None:
+        stop = sys.maxsize
+    if step == None:
+        step = 0.1
+    s=str(step)
+    pre = len(s[s.find(".")+1:])
+    snum = start-step
+    while snum<stop:
+        snum=snum+step
+        snum=round(snum,pre)
+        yield snum
+
+
+for i in frange(1,20,0.002):
+    print(i)

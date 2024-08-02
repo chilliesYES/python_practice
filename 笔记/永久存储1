@@ -1,0 +1,26 @@
+
+f=open('wdnmd.txt', 'w+')
+f.write('holy shit!\n')
+f.writelines(['a b\n','c d\n'])
+for each in f:
+    print(each)
+print(f.tell())
+f.seek(0)
+print(f.readline(), end='')
+print(f.read())
+
+f.close()
+
+
+fc = open('FishC.txt','r+')
+fc.seek(11)
+f0 = fc.read(5)
+for i in f0:
+    print(i)
+
+fc.seek(0)
+net = fc.read(15)
+nfc = open('FishC.txt','w')
+nfc.write(net)
+fc.close()
+nfc.close()

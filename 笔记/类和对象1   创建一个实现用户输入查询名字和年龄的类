@@ -2,6 +2,7 @@ import re
 class Person:
     name=None
     age=None
+    print("看我看我")#当一个类被定义时里面能执行的代码都会执行
     def set_age(self):
         while True:
             try:

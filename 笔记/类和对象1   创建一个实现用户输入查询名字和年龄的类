@@ -12,15 +12,18 @@ class Person:
                 print('please enter an number!')
 
     def set_name(self):
-            a=input('please enter your name:')
-            def is_valid_chinese_name(name):
-                # 定义正则表达式，匹配所有常见的中文字符
-                chinese_name_regex = re.compile(r'^[\u4e00-\u9fa5]{2,4}$')
-                return bool(chinese_name_regex.match(name))
-            if is_valid_chinese_name(a)==True:
-                self.name = a
-            else:
-                print('please enter a valid name!')
+            while True:
+	            a=input('please enter your name:')
+	            def is_valid_chinese_name(name):
+	                # 定义正则表达式，匹配所有常见的中文字符
+	                chinese_name_regex = re.compile(r'^[\u4e00-\u9fa5]{2,4}$')
+	                return bool(chinese_name_regex.match(name))
+	            if is_valid_chinese_name(a)==True:
+	                self.name = a
+	                break
+	            else:
+	                print('please enter a valid name!')
+	               
     def get_name(self):
         if self.name!=None:
             return self.name
@@ -34,4 +37,6 @@ class Person:
 
 p1 = Person()
 p2 = Person()
-p1.get_age()
+p1.set_name()
+p1.set_age()
+print(f'{p1.get_name()} is {p1.get_age()}years old')

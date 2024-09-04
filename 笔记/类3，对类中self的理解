@@ -1,0 +1,13 @@
+class A:
+    def txt1(self):
+        print('wdnmd')
+A.txt1
+print(type(A.txt1))
+
+a = A()
+a.txt1
+print(type(a.txt1))
+
+aa = A()
+aa.txt1()
+print(type(aa.txt1()))

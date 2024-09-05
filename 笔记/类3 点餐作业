@@ -1,0 +1,35 @@
+import re
+class Menu:
+    #meet = {'eeg':1,'beef':25,'ymeet':30}
+    pr = {'on':2,'to':2,'po':3,'ca':3,'egg':1,'beef':25,'ymeet':30}
+    me = {'a':['on','beef'],'b':['on','ymeet'],'c':['egg','egg'],'d':['to','to','egg','egg','egg'],'e':['po','po','ca','ymeet','ymeet']}
+    me0 = ['a','b','c','d','e']
+    ort=[]
+    def order(self):
+            ask = input('吃什么:')
+            self.ort = list(ask)
+            for i in self.ort:
+                if i in [' ',',','-']:
+                    self.ort = re.split(r'\s+|,|-', ask)#r是原始字符串，防止分隔符以被转义的状态被读取，所以需要以文本格式读取成真正的转义字符
+                    break
+            for i in self.ort:
+                if i not in self.me0:
+                    print('please write abcde')
+                    self.order()
+    def pay(self):
+        tankpr = []
+        for i in self.ort:
+            for j in self.me[i]:
+                tankpr.append(j)
+        s = set(tankpr)
+        moa=0
+        for i in s:
+            n = tankpr.count(i)
+            moo = self.pr[i]*n
+            moa = moa+moo
+            print(f'{i} * {n} = {moo}')
+        print('allmoney is{}'.format(moa))
+
+p=Menu()
+p.order()
+p.pay()

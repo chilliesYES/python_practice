@@ -4,7 +4,9 @@ class Menu:
     pr = {'on':2,'to':2,'po':3,'ca':3,'egg':1,'beef':25,'ymeet':30}
     me = {'a':['on','beef'],'b':['on','ymeet'],'c':['egg','egg'],'d':['to','to','egg','egg','egg'],'e':['po','po','ca','ymeet','ymeet']}
     me0 = ['a','b','c','d','e']
-    ort=[]
+    #ort=[]
+    def __init__(self):
+        self.ort=[]#这个只有每个对象在用最好不放到类属性里面
     def order(self):
             ask = input('吃什么:')
             self.ort = list(ask)

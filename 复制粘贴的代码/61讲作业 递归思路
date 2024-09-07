@@ -1,0 +1,11 @@
+def get_bases(cls, count=0):
+    # 利用count记录递归级数
+    for i in range(count):
+        print("-", end=" ")
+    print(cls)
+   
+    if cls.__bases__[0] is not object:
+        for each in cls.__bases__:
+            count += 1
+            get_bases(each, count)
+            count -= 1

@@ -1,0 +1,47 @@
+import Path from pathlib
+import time
+fapath = Path(input('your path:'))
+
+
+class filebody:
+	name=None
+	size=None
+	location=None
+	mtime=None
+	def __init__(self,name,size,location,mtime):
+		self.name=name
+		self.size=size/(1024*1024)
+		self.location=location
+		self.mtime=time.ctime(mtime)
+		
+		
+class filema:
+	tank=[]
+	def __init__(self,fapath):
+		self.fapath=fapath
+	def showall(self):
+		for each in self.fapath.iterdir():
+				filestat=each.stat()
+				name=each.name
+				size=filestat.st_size
+				location=each.resolve()
+				mtime=filestat.st_mtime
+				self.tank.append(filebody(name,size,location,mtime))
+			if each.is_file():
+				print(each.resolve())
+			else:
+				self.showall(each)
+	def sefile(self.ufile):
+		for i in self.tank:
+			if ufile in i.name:
+				print(f'{i.name} \n size:{i.size} \n location:{i.location} \n mtime;{i.mtime}')
+		print('no file')
+
+
+
+
+f=filema(fapath)
+f.showall()
+ask=input('your searching file:')
+f.sefile(ask)
+		

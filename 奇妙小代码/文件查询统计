@@ -1,4 +1,4 @@
-import Path from pathlib
+from pathlib import Path
 import time
 fapath = Path(input('your path:'))
 
@@ -19,19 +19,19 @@ class filema:
 	tank=[]
 	def __init__(self,fapath):
 		self.fapath=fapath
-	def showall(self):
-		for each in self.fapath.iterdir():
+	def showall(self,path):
+		for each in path.iterdir():
 				filestat=each.stat()
 				name=each.name
 				size=filestat.st_size
 				location=each.resolve()
 				mtime=filestat.st_mtime
 				self.tank.append(filebody(name,size,location,mtime))
-			if each.is_file():
-				print(each.resolve())
-			else:
-				self.showall(each)
-	def sefile(self.ufile):
+				if each.is_file():
+					print(each.resolve())
+				else:
+					self.showall(each)
+	def sefile(self,ufile):
 		for i in self.tank:
 			if ufile in i.name:
 				print(f'{i.name} \n size:{i.size} \n location:{i.location} \n mtime;{i.mtime}')
@@ -41,7 +41,7 @@ class filema:
 
 
 f=filema(fapath)
-f.showall()
+f.showall(fapath)
 ask=input('your searching file:')
 f.sefile(ask)
 		

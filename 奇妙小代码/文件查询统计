@@ -1,6 +1,7 @@
 from pathlib import Path
 import time
 from datetime import datetime
+import os
 #test:D:\ev录屏\EVCapture
 
 class filebody:
@@ -39,18 +40,22 @@ class filema:
 	# 		pass
 	def shallowstore(self,path):
 		for each in path.iterdir():
-			filestat = each.stat()
-			name = each.name
-			size = filestat.st_size/(1024*1024)
-			location = each.resolve()
-			mtime = filestat.st_mtime
-			self.tank.append(filebody(name, size, location, mtime))
-			if each.is_file():
-				#signer = self.getsigner(each)
-				self.tankfile.append(filebody(name, size, location, mtime))
-			else:
-				size = self.foldersize(each)
-				self.tankfolder.append(filebody(name, size, location, mtime))
+			try:
+				filestat = each.stat()
+				name = each.name
+				size = filestat.st_size/(1024*1024)
+				location = each.resolve()
+				mtime = filestat.st_mtime
+				self.tank.append(filebody(name, size, location, mtime))
+				if each.is_file():
+					#signer = self.getsigner(each)
+					self.tankfile.append(filebody(name, size, location, mtime))
+				else:
+					size = self.foldersize(each)
+					self.tankfolder.append(filebody(name, size, location, mtime))
+			except PermissionError:
+				pass
+
 
 	def foldersize(self,path):
 		size = 0
@@ -63,20 +68,23 @@ class filema:
 		return size
 	def store(self,path):
 		for each in path.iterdir():
-			filestat=each.stat()
-			name=each.name
-			size=filestat.st_size/(1024*1024)
-			location=each.resolve()
-			mtime=filestat.st_mtime
-			self.tank.append(filebody(name,size,location,mtime))
-			if each.is_file():
-				self.tankfile.append(filebody(name, size, location, mtime))
-			else:
-				size = self.foldersize(each)
-				self.tankfolder.append(filebody(name, size, location, mtime))
-				self.store(each)
+			try:
+				filestat=each.stat()
+				name=each.name
+				size=filestat.st_size/(1024*1024)
+				location=each.resolve()
+				mtime=filestat.st_mtime
+				self.tank.append(filebody(name,size,location,mtime))
+				if each.is_file():
+					self.tankfile.append(filebody(name, size, location, mtime))
+				else:
+					size = self.foldersize(each)
+					self.tankfolder.append(filebody(name, size, location, mtime))
+					self.store(each)
+			except PermissionError:
+				pass
 
-	def show(self,space):#all folder file  "str"
+	def show(self,space):#1all 2folder 3file
 		if space==1:
 			for i in self.tank:
 				print(i.location)
@@ -101,8 +109,17 @@ class filema:
 		print('无了')
 
 def requirement():
+	def showtree(path,i=1):
+		for each in path.iterdir():
+			try:
+				print(' -'*i,each.name)
+				if each.is_dir():
+					showtree(each,i+1)
+			except PermissionError:
+				pass
+
 	while True:
-		require = input('1:对文件夹进行大小排序\n2:对文件进行大小排序\n3:获取所有文件后缀类型\n4:获取签名者（请勿选择）\n5:搜索文件\n6:结束')
+		require = input('1:对文件夹进行大小排序\n2:对文件进行大小排序\n3:获取所有文件后缀类型\n4:展示目录树\n5:搜索文件\n6:结束')
 		if require == '1':
 			num = int(input('需要多少个排名(需要全部请输入999)：'))
 			_ = sorted(f.tankfolder, key=lambda item: item.size, reverse=True)  # 排序对象的一个对象列表key要这样传递
@@ -116,7 +133,7 @@ def requirement():
 			_ = sorted(f.tankfile, key=lambda item: item.size, reverse=True)
 			n = 1
 			for each in _[0:num]:
-				print(f'{n:<3} {each.name:<30}{each.size:<.2f}M')
+				print(f'{n:<3} {each.name:<30}{each.size:>8.2f}M')
 				n=n+1
 			print()
 		elif require == '3':
@@ -129,11 +146,7 @@ def requirement():
 				print(each,end='  ')
 			print()
 		elif require == '4':
-			signer = set()
-			for each in f.tankfile:
-				signer.add(each.signer)
-			print(signer)
-			print()
+			showtree(fapath)
 		elif require == '5':
 			ask = input('你要查找的文件:')
 			f.sefile(ask)

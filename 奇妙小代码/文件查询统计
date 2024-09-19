@@ -1,45 +1,156 @@
 from pathlib import Path
 import time
 from datetime import datetime
-fapath = Path(input('your path:'))
+#test:D:\ev录屏\EVCapture
 
 class filebody:
 	name=None
 	size=None
 	location=None
 	mtime=None
-	def __init__(self,name,size,location,mtime):
+	signer=None
+	def __init__(self,name,size,location,mtime,signer=None):
 		self.name=name
-		self.size=size/(1024*1024)
+		self.size=size
 		self.location=location
 		self.mtime = time.strftime("%Y年%m月%d日 %H:%M:%S", time.localtime(mtime))
+		self.signer=signer
 		#self.mtime=time.ctime(mtime)
 
 class filema:
+	mesize=0
 	tank=[]
+	tankfolder=[]
+	tankfile=[]
 	def __init__(self,fapath):
 		self.fapath=fapath
-	def showall(self,path):
+	# def getsigner(self,file_path):
+	# 	try:
+	# 		# 使用 win32api 获取文件签名信息
+	# 		signed_info = win32api.VerifyVersionInfo(self.file_path, None)
+	# 		cert = win32crypt.CryptQueryObject(signed_info, self.file_path, None, None, None)
+	#
+	# 		# 从证书中提取签名者信息（一般包括名字）
+	# 		signer_info = cert['SignerInfo']
+	# 		signer_name = signer_info['Name']
+	#
+	# 		return signer_name
+	# 	except Exception:
+	# 		pass
+	def shallowstore(self,path):
 		for each in path.iterdir():
-				filestat=each.stat()
-				name=each.name
-				size=filestat.st_size
-				location=each.resolve()
-				mtime=filestat.st_mtime
-				self.tank.append(filebody(name,size,location,mtime))
-				if each.is_file():
-					print(each.resolve())
-				else:
-					self.showall(each)
+			filestat = each.stat()
+			name = each.name
+			size = filestat.st_size/(1024*1024)
+			location = each.resolve()
+			mtime = filestat.st_mtime
+			self.tank.append(filebody(name, size, location, mtime))
+			if each.is_file():
+				#signer = self.getsigner(each)
+				self.tankfile.append(filebody(name, size, location, mtime))
+			else:
+				size = self.foldersize(each)
+				self.tankfolder.append(filebody(name, size, location, mtime))
+
+	def foldersize(self,path):
+		size = 0
+		for i in path.iterdir():
+			if i.is_file():
+				size += i.stat().st_size/(1024*1024)
+			else:
+				k = self.foldersize(i)
+				size += k
+		return size
+	def store(self,path):
+		for each in path.iterdir():
+			filestat=each.stat()
+			name=each.name
+			size=filestat.st_size/(1024*1024)
+			location=each.resolve()
+			mtime=filestat.st_mtime
+			self.tank.append(filebody(name,size,location,mtime))
+			if each.is_file():
+				self.tankfile.append(filebody(name, size, location, mtime))
+			else:
+				size = self.foldersize(each)
+				self.tankfolder.append(filebody(name, size, location, mtime))
+				self.store(each)
+
+	def show(self,space):#all folder file  "str"
+		if space==1:
+			for i in self.tank:
+				print(i.location)
+		elif space==2:
+			for i in self.tankfolder:
+				print(i.location)
+		elif space==3:
+			for i in self.tankfile:
+				print(i.location)
+		else:
+			print('show函数参数错误')
+			pass
 	def sefile(self,ufile):
-		for i in self.tank:
-			if ufile in i.name:
-				print(f'{i.name} \n size:{i.size:.3f}M \n location:{i.location} \n mtime;{i.mtime}\n')
-		print('no file')
+		if ufile[0] == '.':
+			for i in self.tankfile:
+				if i.location.suffix==ufile:
+					print(f'{i.name}	大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n')
+		else:
+			for i in self.tank:
+				if ufile in i.name:
+					print(f'{i.name}	大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n')
+		print('无了')
 
+def requirement():
+	while True:
+		require = input('1:对文件夹进行大小排序\n2:对文件进行大小排序\n3:获取所有文件后缀类型\n4:获取签名者（请勿选择）\n5:搜索文件\n6:结束')
+		if require == '1':
+			num = int(input('需要多少个排名(需要全部请输入999)：'))
+			_ = sorted(f.tankfolder, key=lambda item: item.size, reverse=True)  # 排序对象的一个对象列表key要这样传递
+			n = 1
+			for each in _[0:num]:
+				print(f'{n:<3} {each.name:<30}{each.size:>.2f}M')
+				n += 1
+			print()
+		elif require == '2':
+			num = int(input('需要多少个排名(需要全部请输入999)：'))
+			_ = sorted(f.tankfile, key=lambda item: item.size, reverse=True)
+			n = 1
+			for each in _[0:num]:
+				print(f'{n:<3} {each.name:<30}{each.size:<.2f}M')
+				n=n+1
+			print()
+		elif require == '3':
+			exname = set()
+			for each in f.tankfile:
+				_ = each.location
+				exname.add(_.suffix)
+			print('该路径下所有文件的后缀类型有: ',end='')
+			for each in exname:
+				print(each,end='  ')
+			print()
+		elif require == '4':
+			signer = set()
+			for each in f.tankfile:
+				signer.add(each.signer)
+			print(signer)
+			print()
+		elif require == '5':
+			ask = input('你要查找的文件:')
+			f.sefile(ask)
+		else:
+			break
 
-f=filema(fapath)
-f.showall(fapath)
-ask=input('your searching file:')
-f.sefile(ask)
+fapath = Path(input('输入你的路径:'))
+f = filema(fapath)
+mode = input('1:深层模式  2:浅层模式')
+if mode=='1':
+	f.store(fapath)
+	f.show(1)
+	requirement()
+elif mode=='2':
+	f.shallowstore(fapath)
+	f.show(1)
+	requirement()
+else:
+	print('请输入1或2，输入其他将结束')
 		

@@ -1,0 +1,28 @@
+from tkinter import *
+from tkinter import messagebox
+
+class app(Frame):
+	def __init__(self,  master=None):
+		super().__init__(master)
+		self.pack()
+		self.master=master
+		self.rb()
+		
+	def rb(self):
+		self.v = StringVar()
+		self.v.set('2')
+		Radiobutton(self, text='1', value='1', variable=self.v).pack(side='left')
+		Radiobutton(self, text='2', value='2', variable=self.v).pack(side='left')
+		Radiobutton(self, text='3', value='3', variable=self.v).pack(side='left')
+		def ac():
+			messagebox.showinfo('your chose', 'you choose'+self.v.get())
+		self.y = Button(self, text='OK', command=ac)
+		self.y.pack()
+
+
+
+root = Tk()
+root.title('this is a title')
+a=app(root)
+a.mainloop()
+		

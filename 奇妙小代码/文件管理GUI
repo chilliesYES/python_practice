@@ -1,0 +1,57 @@
+from tkinter import *
+from tkinter import messagebox
+
+
+class app(Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.pack()
+        self.master = master
+        self.up()
+        self.filecrt()
+        self.dircrt()
+        self.publicen()
+    def tt(self):
+        messagebox.showinfo("test", "test")
+
+
+    def up(self):
+        self.fapath = StringVar()
+        modc = IntVar()
+        p1 = Entry(self, textvariable=StringVar());p1.grid(row=0, column=0, columnspan=6, sticky=EW, ipady=5, padx=5, pady=20)
+        Button(self, text='    加载    ', command=self.tt).grid(row=0, column=6, sticky=EW,padx=5)
+        Checkbutton(self, text='深层模式', variable=modc, onvalue=1, offvalue=0).grid(row=0, column=7)
+
+    def publicen(self):
+        self.r1e1 = IntVar()
+        self.r2e1 = StringVar()
+        self.r2e2 = IntVar()
+        self.modc1 = IntVar()
+        self.newname = StringVar()
+        self.manyn = IntVar()
+        Entry(self, textvariable=self.r1e1, width=5).grid(row=1, column=3, sticky=W)
+        Entry(self, textvariable=self.newname, width=10).grid(row=2, column=3, sticky=W)
+        Label(self, text='期望排序个数:').grid(row=1, column=2)
+        Label(self, text='名称:').grid(row=2, column=2, sticky=E)
+        Checkbutton(self, text='批量创建', variable=self.modc1, onvalue=1, offvalue=0).grid(row=2, column=4, sticky=W)
+        Entry(self, textvariable=self.manyn, width=2).grid(row=2, column=5, sticky=W)
+
+
+    def filecrt(self):
+        modc2=IntVar()
+        Button(self, text='按文件大小排序', command=self.tt).grid(row=1, column=0)
+        Button(self, text='创建新的文件',command=self.tt).grid(row=2, column=0, sticky=EW)
+
+
+    def dircrt(self):
+        #Label(self, text='   ').grid(row=1, column=3)
+        Button(self, text='按文件夹大小排序',command=self.tt).grid(row=1, column=1,pady=5)
+        #Entry(self, textvariable=num, width=10).grid(row=1, column=5, columnspan=2, sticky=W)
+        Button(self, text='创建新的文件夹', command=self.tt).grid(row=2, column=1, sticky=EW)
+
+
+
+root=Tk()
+root.geometry('500x300')
+a=app(root)
+a.mainloop()

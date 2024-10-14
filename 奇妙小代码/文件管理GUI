@@ -1,57 +1,299 @@
+from pathlib import Path
+import time
+from datetime import datetime
+import os
+import shutil
 from tkinter import *
 from tkinter import messagebox
+#test:D:\ev录屏\EVCapture
+
+class filebody:
+	name=None
+	size=None
+	location=None
+	mtime=None
+	signer=None
+	def __init__(self,name,size,location,mtime,signer=None):
+		self.name=name
+		self.size=size
+		self.location=location
+		self.mtime = time.strftime("%Y年%m月%d日 %H:%M:%S", time.localtime(mtime))
+		self.signer=signer
+		#self.mtime=time.ctime(mtime)
+
+class filema:
+	mesize=0
+	tank=[]
+	tankfolder=[]
+	tankfile=[]
+	def __init__(self,fapath):
+		self.fapath=fapath
+	# def getsigner(self,file_path):
+	# 	try:
+	# 		# 使用 win32api 获取文件签名信息
+	# 		signed_info = win32api.VerifyVersionInfo(self.file_path, None)
+	# 		cert = win32crypt.CryptQueryObject(signed_info, self.file_path, None, None, None)
+	#
+	# 		# 从证书中提取签名者信息（一般包括名字）
+	# 		signer_info = cert['SignerInfo']
+	# 		signer_name = signer_info['Name']
+	#
+	# 		return signer_name
+	# 	except Exception:
+	# 		pass
+	def shallowstore(self,path):
+		for each in path.iterdir():
+			try:
+				filestat = each.stat()
+				name = each.name
+				size = filestat.st_size/(1024*1024)
+				location = each.resolve()
+				mtime = filestat.st_mtime
+				self.tank.append(filebody(name, size, location, mtime))
+				if each.is_file():
+					#signer = self.getsigner(each)
+					self.tankfile.append(filebody(name, size, location, mtime))
+				else:
+					size = self.foldersize(each)
+					self.tankfolder.append(filebody(name, size, location, mtime))
+			except PermissionError:
+				pass
 
 
-class app(Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.pack()
-        self.master = master
-        self.up()
-        self.filecrt()
-        self.dircrt()
-        self.publicen()
-    def tt(self):
-        messagebox.showinfo("test", "test")
+	def foldersize(self,path):
+		size = 0
+		for i in path.iterdir():
+			if i.is_file():
+				size += i.stat().st_size/(1024*1024)
+			else:
+				k = self.foldersize(i)
+				size += k
+		return size
+	def store(self,path):
+		for each in path.iterdir():
+			try:
+				filestat=each.stat()
+				name=each.name
+				size=filestat.st_size/(1024*1024)
+				location=each.resolve()
+				mtime=filestat.st_mtime
+				self.tank.append(filebody(name,size,location,mtime))
+				if each.is_file():
+					self.tankfile.append(filebody(name, size, location, mtime))
+				else:
+					size = self.foldersize(each)
+					self.tankfolder.append(filebody(name, size, location, mtime))
+					self.store(each)
+			except PermissionError:
+				pass
+	def newfilestore(self,path):
+		filestat=path.stat()
+		name=path.name
+		size=filestat.st_size/(1024*1024)
+		location=path.resolve()
+		mtime=filestat.st_mtime
+		self.tank.append(filebody(name, size, location, mtime))
+		if path.is_dir():
+			size = self.foldersize(path)
+			self.tankfolder.append(filebody(name, size, location, mtime))
+		else:
+			self.tankfile.append(filebody(name, size, location, mtime))
 
+	def show(self,space):#1all 2folder 3file
+		if space==1:
+			for i in self.tank:
+				print(i.location)
+		elif space==2:
+			for i in self.tankfolder:
+				print(i.location)
+		elif space==3:
+			for i in self.tankfile:
+				print(i.location)
+		else:
+			print('show函数参数错误')
+			pass
+	def sefile(self,ufile):
+		if ufile[0] == '.':
+			for i in self.tankfile:
+				if i.location.suffix==ufile:
+					print(f'{i.name}	大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n')
+		else:
+			for i in self.tank:
+				if ufile in i.name:
+					print(f'{i.name}	大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n')
+		print('无了')
 
-    def up(self):
-        self.fapath = StringVar()
-        modc = IntVar()
-        p1 = Entry(self, textvariable=StringVar());p1.grid(row=0, column=0, columnspan=6, sticky=EW, ipady=5, padx=5, pady=20)
-        Button(self, text='    加载    ', command=self.tt).grid(row=0, column=6, sticky=EW,padx=5)
-        Checkbutton(self, text='深层模式', variable=modc, onvalue=1, offvalue=0).grid(row=0, column=7)
+def requirement():
+	def showtree(path,i=1):
+		for each in path.iterdir():
+			try:
+				print(' -'*i,each.name)
+				if each.is_dir():
+					showtree(each,i+1)
+			except PermissionError:
+				pass
 
-    def publicen(self):
-        self.r1e1 = IntVar()
-        self.r2e1 = StringVar()
-        self.r2e2 = IntVar()
-        self.modc1 = IntVar()
-        self.newname = StringVar()
-        self.manyn = IntVar()
-        Entry(self, textvariable=self.r1e1, width=5).grid(row=1, column=3, sticky=W)
-        Entry(self, textvariable=self.newname, width=10).grid(row=2, column=3, sticky=W)
-        Label(self, text='期望排序个数:').grid(row=1, column=2)
-        Label(self, text='名称:').grid(row=2, column=2, sticky=E)
-        Checkbutton(self, text='批量创建', variable=self.modc1, onvalue=1, offvalue=0).grid(row=2, column=4, sticky=W)
-        Entry(self, textvariable=self.manyn, width=2).grid(row=2, column=5, sticky=W)
+	while True:
+		require = input('1:对文件夹进行大小排序\n2:对文件进行大小排序\n3:获取所有文件后缀类型\n4:展示目录树\n5:搜索文件\n6:创建新的文件\n7:创建新的文件夹\n8:删除文件\n9:删除文件夹\n10:删除空文件夹')
+		if require == '1':
+			num = int(input('需要多少个排名(需要全部请输入999)：'))
+			_ = sorted(f.tankfolder, key=lambda item: item.size, reverse=True)  # 排序对象的一个对象列表key要这样传递
+			n = 1
+			for each in _[0:num]:
+				print(f'{n:<3} {each.name:<30}{each.size:>.2f}M')
+				n += 1
+			print()
+		elif require == '2':
+			num = int(input('需要多少个排名(需要全部请输入999)：'))
+			_ = sorted(f.tankfile, key=lambda item: item.size, reverse=True)
+			n = 1
+			for each in _[0:num]:
+				print(f'{n:<3} {each.name:<30}{each.size:>8.2f}M')
+				n=n+1
+			print()
+		elif require == '3':
+			exname = set()
+			for each in f.tankfile:
+				_ = each.location
+				exname.add(_.suffix)
+			print('该路径下所有文件的后缀类型有: ',end='')
+			for each in exname:
+				print(each,end='  ')
+			print()
+		elif require == '4':
+			showtree(fapath)
+		elif require == '5':
+			ask = input('你要查找的文件:')
+			f.sefile(ask)
+		elif require == '6':
+			m = input('是否需要批量创建文件 1：不需要 2：需要')
+			if m == '1':
+				try:
+					newfn = str(input('新文件的名称：'))
+					(fapath/newfn).touch(exist_ok=False)
+					f.newfilestore(fapath/newfn)
+				except FileExistsError:
+					print('你想创建的文件已经存在')
+			elif m == '2':
+				newfn = str(input('(默认序列号添加在开头从1开始)新文件的名称：'))
+				num = int(input('一共需要多少个文件：'))
+				for i in range(num):
+					order = str(i+1) + '_'
+					path = fapath/(order+newfn)
+					path.touch()
+					f.newfilestore(path)
+				print()
+		elif require == '7':
+			m = input('是否需要批量创建文件夹 1：不需要 2：需要')
+			if m == '1':
+				try:
+					newfn = str(input('新文件夹的名称：'))
+					(fapath / newfn).mkdir(exist_ok=False)
+					f.newfilestore(fapath / newfn)
+				except FileExistsError:
+					print('你想创建的文件夹已经存在')
+			elif m == '2':
+				newfn = str(input('(默认序列号添加在开头从1开始)新文件的名称：'))
+				num = int(input('一共需要多少个文件夹：'))
+				for i in range(num):
+					order = str(i + 1) + '_'
+					path = fapath / (order + newfn)
+					path.mkdir()
+					f.newfilestore(path)
+				print()
+		elif require == '8':
+			m = input('删除模式：1.相似删除 2.完全匹配删除')
+			delf = input('你想删除什么文件:')
+			deltank = {}
+			locatank = []
+			if m == '2':
+				i = 0
+				for each in f.tankfile:
+					if each.name==delf:
+						deltank.update({each.name:[each.location,each.size]})
+						locatank.append(i)
+					i += 1
+				if len(deltank) == 0:
+					print('未查找到你要删除的文件,该文件不存在或未选择深层模式')
+				else:
+					print('查到以下文件：')
+					for each in deltank:
+						print(f'{each:<30},{deltank[each][1]:<8},{deltank[each][0]:<}')
+					yn = input('1.确定删除 2.取消删除')
+					if yn == '1':
+						for each in deltank:
+							deltank[each][0].unlink()
+						for each in sorted(locatank,reverse=True):
+							(f.tank).pop(each)
+							(f.tankfile).pop(each)
+			elif m == '1':
+				i=0
+				for each in f.tankfile:
+					if delf in each.name:
+						deltank.update({each.name:[each.location,each.size]})
+						locatank.append(i)
+					i += 1
+				if len(deltank) == 0:
+					print('未查找到你要删除的文件,该文件不存在或未选择深层模式')
+				else:
+					print('查到以下文件：')
+					for each in deltank:
+						print(f'{each:<30}{deltank[each][1]:<8}{str(deltank[each][0]):<}')#path格式的路径不能进行字符串格式化操作必须转为str
+					yn = input('1.确定删除 2.取消删除')
+					if yn == '1':
+						for each in deltank:
+							deltank[each][0].unlink()
+						for each in sorted(locatank,reverse=True):#反向遍历防止从头开始遍历删除出现的列表长度变化导致删错
+							(f.tank).pop(each)
+							(f.tankfile).pop(each)
+				print()
+		elif require == '9':
+			deldir = input('要删除哪个文件夹')
+			dir_path = fapath / deldir
+			ask = input(f'你要删除的文件夹路径是  {dir_path}  输入1确认删除输入其他取消删除')
+			if ask == '1':
+				try:
+					shutil.rmtree(dir_path)
+					i=0
+					for each in f.tankfolder:
+						if dir_path == each.location:
+							f.tankfolder.pop(i)
+						i+=1
+				except FileNotFoundError:
+					print('没找到该文件')
+		elif require == '10':
+			deltank = {}
+			locatank=[]
+			i=0
+			deldir = input('（默认进行相似搜索删除）文件名:')
+			for each in f.tankfolder:
+				if deldir in each.name:
+					deltank.update({each.name:[each.location,each.size]})
+					locatank.append(i)
+				i += 1
+			for each in deltank:
+				try:
+					deltank[each][0].rmdir()
+				except OSError:
+					pass
+			for each in sorted(locatank, reverse=True):
+				(f.tankfolder).pop(each)
+				(f.tank).pop(each)
 
+		else:
+			break
 
-    def filecrt(self):
-        modc2=IntVar()
-        Button(self, text='按文件大小排序', command=self.tt).grid(row=1, column=0)
-        Button(self, text='创建新的文件',command=self.tt).grid(row=2, column=0, sticky=EW)
-
-
-    def dircrt(self):
-        #Label(self, text='   ').grid(row=1, column=3)
-        Button(self, text='按文件夹大小排序',command=self.tt).grid(row=1, column=1,pady=5)
-        #Entry(self, textvariable=num, width=10).grid(row=1, column=5, columnspan=2, sticky=W)
-        Button(self, text='创建新的文件夹', command=self.tt).grid(row=2, column=1, sticky=EW)
-
-
-
-root=Tk()
-root.geometry('500x300')
-a=app(root)
-a.mainloop()
+fapath = Path(input('输入你的路径:'))
+f = filema(fapath)
+mode = input('如需进行扫盘操作请选择浅层模式否则后果自负！\n1:深层模式  2:浅层模式')
+if mode=='1':
+	f.store(fapath)
+	f.show(1)
+	requirement()
+elif mode=='2':
+	f.shallowstore(fapath)
+	f.show(1)
+	requirement()
+else:
+	print('请输入1或2，输入其他将结束')
+		

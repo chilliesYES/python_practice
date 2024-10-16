@@ -76,22 +76,28 @@ class filema:
         return size
 
     def store(self, path):
-        for each in path.iterdir():
-            try:
-                filestat = each.stat()
-                name = each.name
-                size = filestat.st_size / (1024 * 1024)
-                location = each.resolve()
-                mtime = filestat.st_mtime
-                self.tank.append(filebody(name, size, location, mtime))
-                if each.is_file():
-                    self.tankfile.append(filebody(name, size, location, mtime))
-                else:
-                    size = self.foldersize(each)
-                    self.tankfolder.append(filebody(name, size, location, mtime))
-                    self.store(each)
-            except PermissionError:
-                pass
+        self.mesize = 0
+        self.tank = []
+        self.tankfolder = []
+        self.tankfile = []
+        def sss(path):
+            for each in path.iterdir():
+                try:
+                    filestat = each.stat()
+                    name = each.name
+                    size = filestat.st_size / (1024 * 1024)
+                    location = each.resolve()
+                    mtime = filestat.st_mtime
+                    self.tank.append(filebody(name, size, location, mtime))
+                    if each.is_file():
+                        self.tankfile.append(filebody(name, size, location, mtime))
+                    else:
+                        size = self.foldersize(each)
+                        self.tankfolder.append(filebody(name, size, location, mtime))
+                        sss(each)
+                except PermissionError:
+                    pass
+        sss(path)
 
     def newfilestore(self, path):
         filestat = path.stat()
@@ -125,11 +131,11 @@ class filema:
         if ufile[0] == '.':
             for i in self.tankfile:
                 if i.location.suffix == ufile:
-                    outpack += f'{i.name}	大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n'
+                    outpack += f'{i.name}\n大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n\n'
         else:
             for i in self.tank:
                 if ufile in i.name:
-                    outpack += f'{i.name}	大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n'
+                    outpack += f'{i.name}\n大小:{i.size:.3f}M \n地址:{i.location} \n上次修改时间:{i.mtime}\n\n'
         return outpack
 
 
@@ -303,6 +309,7 @@ def load(path, mode):
     if mode == 1:
         a.infowindow('深层模式加载中。。。。。。')
         f.store(fapath)
+        #print(f.tankfile)
         a.infowindow('深层模式加载完成')
         #requirement()
     elif mode == 0:
@@ -326,11 +333,13 @@ def load(path, mode):
 # else:
 # print('请输入1或2，输入其他将结束')
 def sofile():
+    print('ssss')
     _ = sorted(f.tankfile, key=lambda item: item.size, reverse=True)
     n = 1
     out=str()
     for each in _[0:a.r1e1.get()]:#获取1行公共enter的值
         out += f'{n:<3} {each.name:<30}{each.size:>8.2f}M\n'
+        print(each.name)
         n = n + 1
     a.infowindow(out)
 def sodir():
@@ -384,28 +393,34 @@ def sefile():
     _=f.sefile(a.insefile.get())
     a.infowindow(_)
 def seexpname():
-    exname = str()
+    exname = set()
     for each in f.tankfile:
         _ = each.location
-        exname += _.suffix
-        exname += ' '
+        print(_.suffix)
+        exname.add(_.suffix)
+    exname=(' '.join(exname))
     a.infowindow(exname)
 def tree(path, i=1):
-    for each in path.iterdir():
-        try:
-            _bb = ' -' * i
-            a.treetank += _bb+each.name
-            if each.is_dir():
-                tree(each, i + 1)#可能有问题
-        except PermissionError:
-            pass
+    treetank=str()
+    def _ff(path,i=1):
+        nonlocal treetank
+        for each in path.iterdir():
+            try:
+                _bb = ' -' * i
+                treetank += f'{_bb} {each.name}\n'
+                if each.is_dir():
+                    _ff(each, i + 1)#可能有问题
+            except PermissionError:
+                pass
+    _ff(path, i)
+    a.infowindow(treetank)
 
 def delempty():
     out=str()
     for each in f.tankfolder:
         if each.size == 0:
             try:
-                each.rmdir()
+                each.location.rmdir()
                 out += each.name+'  PATH:'+each.location+'\n'
                 (f.tankfolder).pop(each)
                 (f.tank).pop(each)
@@ -456,7 +471,8 @@ class app(Frame):
         Label(self, text='名    称:').grid(row=2, column=2)
         Checkbutton(self, text='批量创建', variable=self.modec1, onvalue=1, offvalue=0).grid(row=2, column=3, sticky=E)#modc1已改
         Entry(self, textvariable=self.r2e2, width=2).grid(row=2, column=4, sticky=W)
-        Button(self, text='展示目录树', command=lambda :tree(fapath)).grid(row=4, column=0,columnspan=2, padx=5,sticky=EW);self.treetank=str()
+        _tree = Button(self, text='展示目录树', command=lambda :tree(fapath));_tree.grid(row=4, column=0,columnspan=2, padx=5,sticky=EW)
+        self.treetank=str();_tree.bind('<Button-1>', self.infowindow(self.treetank))
         Button(self, text='清除所有空文件夹', command=delempty).grid(row=4, column=2, columnspan=3, padx=5, sticky=EW)
 
 
